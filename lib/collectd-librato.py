@@ -141,6 +141,8 @@ def librato_config(c):
             config['metric_prefix'] = val
         elif child.key == 'Api':
             config['api'] = val
+        elif child.key == 'ApiPath':
+            config['api_path'] = val
         elif child.key == 'TypesDB':
             config['types_db'] = val
         elif child.key == 'MetricPrefix':
@@ -164,13 +166,17 @@ def librato_config(c):
                 raise Exception(msg)
 
     if not config.has_key('api_token'):
-        raise Exception('APIToken not defined')
+        print 'Warning: Librato APIToken not defined'
 
     if not config.has_key('email'):
-        raise Exception('Email not defined')
+        print 'Warning: Librator Email not defined'
 
     config['user_agent'] = build_user_agent()
-    config['auth_header'] = build_http_auth()
+
+    if config.has_key('email') and config.has_key('api_token'):
+        config['auth_header'] = build_http_auth()
+    else:
+        config['auth_header'] = ''
 
 def librato_flush_metrics(gauges, counters, data):
     """
